@@ -5,7 +5,14 @@ public class WordGen {
     WordGen(int size, char[] charSet) {
         word = new CharSet[size];
         for (int i=0; i<size; i++){
-           word[i] = new CharSet(charSet);
+            word[i] = new CharSet(charSet);
+        }
+    }
+
+    WordGen(int size, char[] charSet, int[] firstWord) {
+        word = new CharSet[size];
+        for (int i=0; i<size; i++){
+            word[i] = new CharSet(charSet, firstWord[i]);
         }
     }
 

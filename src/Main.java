@@ -13,8 +13,10 @@ public class Main {
     private static final int SHA256_LENGTH = 64;
     private static final int SHA512_LENGTH = 128;
 
-    private static final int MIN_SIZE = 6;
-    private static final int MAX_SIZE = 9;
+    private static final String START_WORD = "iBS%";
+    private static final String STOP_WORD = "....";
+    private static final int MIN_SIZE = 4;
+    private static final int MAX_SIZE = 4;
     private static final int CUSTOM_LOOPS = 100;
     private static final int INSIGHT_GRANULARITY = 50000;
     private static final String[] charSets = new String[]{CharSet.LOWER, CharSet.UPPER, CharSet.DIGIT, CharSet.SPECAIL};
@@ -39,7 +41,12 @@ public class Main {
         setCharSet();
         sanityChecks();
         crackHash();
+        END();
+    }
+
+    private static void END(){
         printPossiblePasswords();
+        System.exit(0);
     }
 
     private static void printPossiblePasswords() {
@@ -49,6 +56,7 @@ public class Main {
             System.out.println("Password Not cracked...");
             System.out.println("All combinations tried");
             System.out.println(String.format("CharSet: %s", charSetString));
+            System.out.println(String.format("Start Word: %s \tStop Word: %s", START_WORD, STOP_WORD));
         }
         for (String password : possiblePasswords) {
             System.out.println(String.format("Possible Password: %s", password));
@@ -64,6 +72,7 @@ public class Main {
     private static void crackHashForLength(int size) {
         setWords(size);
         String hash;
+        numberOfTests = INSIGHT_GRANULARITY;
         do {
             hash = customHash(word.get());
             if (PASS_HASH.equals(hash)) {
@@ -72,14 +81,18 @@ public class Main {
                 possiblePasswords.add(word.get());
             }
             incTests();
+            if(word.get().equals(STOP_WORD)){
+                END();
+            }
         } while (word.setNext());
     }
 
     private static void incTests() {
         numberOfTests++;
         if (numberOfTests > INSIGHT_GRANULARITY) {
-            System.out.println(String.format("Testing Word: %s\tSolutions: %d\tRuntime: %s\tEstimate: %s",
+            System.out.println(String.format("Testing Word: %s  (%d)\tSolutions: %d\tRuntime: %s\tEstimate: %s",
                     word.get(),
+                    word.get().length(),
                     possiblePasswords.size(),
                     getRunTime(),
                     getDoneEstimate()));
@@ -129,7 +142,11 @@ public class Main {
     }
 
     private static void setWords(int size) {
-        word = new WordGen(size, charSetString.toCharArray());
+        int[] firstWordArray = new int[size];
+        for(int i=0; i<size; i++){
+            firstWordArray[i] = charSetString.indexOf(START_WORD.charAt(i));
+        }
+        word = new WordGen(size, charSetString.toCharArray(), firstWordArray);
     }
 
     private static void init() {

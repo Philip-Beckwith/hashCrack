@@ -16,6 +16,11 @@ public class CharSet {
         this.charSet = charSet;
     }
 
+    public CharSet(char[] charSet, int i) {
+        this.charSet = charSet;
+        this.index=i;
+    }
+
     public char getChar() {
         return charSet[index];
     }
